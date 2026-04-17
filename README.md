@@ -72,7 +72,7 @@ Built with a clean dark fintech UI, Trackify provides a premium dashboard experi
 - │── README.md
 # ⚙️ Installation & Setup
 ### 1️⃣ Clone Repository
-- git clone https://github.com/your-username/trackify.git
+- git clone https://github.com/sahilchaudhari32/Trackify.git
 - cd trackify
 ### 2️⃣ Setup Backend
 - cd backend
