@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { Bell, Settings, User } from 'lucide-react';
 import './Header.css';
 
@@ -14,10 +15,10 @@ const Header = () => {
         </div>
 
         <nav className="header-nav">
-          <a href="#" className="nav-link active">Dashboard</a>
-          <a href="#" className="nav-link">Transactions</a>
-          <a href="#" className="nav-link">Budgets</a>
-          <a href="#" className="nav-link">Analytics</a>
+          <NavLink to="/dashboard" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Dashboard</NavLink>
+          <NavLink to="/transactions" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Transactions</NavLink>
+          <NavLink to="/budgets" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Budgets</NavLink>
+          <NavLink to="/analytics" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Analytics</NavLink>
         </nav>
 
         <div className="header-right">
@@ -33,3 +34,4 @@ const Header = () => {
 };
 
 export default Header;
+

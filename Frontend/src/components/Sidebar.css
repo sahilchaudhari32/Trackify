@@ -62,12 +62,12 @@
   transition: all 0.3s ease;
 }
 
-.sidebar-nav li.active a {
+.sidebar-nav li a.active {
   background: rgba(16, 185, 129, 0.1);
   color: var(--accent-emerald);
 }
 
-.sidebar-nav li.active a svg {
+.sidebar-nav li a.active svg {
   color: var(--accent-emerald);
 }
 

@@ -1,5 +1,9 @@
 /* Main application container */
-#root {
-  width: 100%;
+.app-root {
   min-height: 100vh;
+  background-color: var(--bg-black);
+}
+
+.main-content {
+  width: 100%;
 }
