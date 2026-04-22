@@ -1,0 +1,6 @@
+.dashboard-root {
+  min-height: 100vh;
+  background-color: var(--bg-black);
+}
+
+/* Uses global .dashboard-container from index.css */

@@ -1,0 +1,104 @@
+.recent-activity-section {
+  margin-top: 2rem;
+}
+
+.activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.activity-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.see-all-btn {
+  color: var(--brand-teal);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.transaction-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.transaction-card-v2 {
+  background-color: var(--bg-card);
+  border-radius: 20px;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s;
+}
+
+.transaction-card-v2:hover {
+  background-color: var(--bg-card-hover);
+}
+
+.left-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.icon-box {
+  width: 56px;
+  height: 56px;
+  background-color: #242527;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+}
+
+.info-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-white);
+}
+
+.info-sub {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.right-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.amount-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.amount-text.expense {
+  color: var(--text-white);
+}
+
+.amount-text.income {
+  color: var(--brand-emerald);
+}
+
+.bank-info {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}

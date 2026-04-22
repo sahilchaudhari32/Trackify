@@ -1,0 +1,174 @@
+.balance-section {
+  width: 100%;
+}
+
+.overview-label {
+  margin-bottom: 2rem;
+}
+
+.label-text {
+  color: var(--brand-teal);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.greeting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.greeting-text {
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.time-selector {
+  display: flex;
+  background: #1c1d1f;
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.time-btn {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-gray);
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.time-btn.active {
+  background: var(--brand-teal);
+  color: #000;
+}
+
+.cards-main-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.balance-card-v2 {
+  background-color: var(--bg-card);
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.trend-badge {
+  background: rgba(25, 212, 168, 0.1);
+  color: var(--brand-teal);
+  padding: 4px 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.main-balance {
+  font-size: 5.5rem;
+  font-weight: 800;
+  letter-spacing: -3px;
+  margin: 1.5rem 0 2.5rem 0;
+  color: var(--text-white);
+}
+
+.sub-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 1.5rem;
+}
+
+.sub-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sub-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.sub-value {
+  color: var(--brand-teal);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* AI Insight Card */
+.ai-insight-card {
+  background-color: #0ea5e9; /* Teal blue color matching image */
+  border-radius: 20px;
+  padding: 2rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.insight-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.insight-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.insight-sub {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 2rem;
+}
+
+.insight-link {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+}
+
+.net-prm-badge {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}

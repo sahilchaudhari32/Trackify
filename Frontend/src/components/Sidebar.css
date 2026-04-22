@@ -1,0 +1,92 @@
+.sidebar {
+  width: 260px;
+  height: calc(100vh - 40px);
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  position: sticky;
+  top: 20px;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 3rem;
+  padding-left: 0.5rem;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--accent-neon), var(--accent-emerald));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-dot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+}
+
+.sidebar-logo h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0;
+}
+
+.sidebar-nav {
+  flex: 1;
+}
+
+.sidebar-nav ul,
+.sidebar-footer ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-nav li a,
+.sidebar-footer li a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+}
+
+.sidebar-nav li.active a {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-emerald);
+}
+
+.sidebar-nav li.active a svg {
+  color: var(--accent-emerald);
+}
+
+.sidebar-nav li a:hover,
+.sidebar-footer li a:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  transform: translateX(5px);
+}
+
+.sidebar-footer {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.logout {
+  color: var(--accent-rose) !important;
+}
+
+.logout:hover {
+  background: rgba(244, 63, 94, 0.1) !important;
+}
