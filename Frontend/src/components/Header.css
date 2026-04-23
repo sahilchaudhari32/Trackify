@@ -12,8 +12,6 @@
 
 .header-inner {
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
   padding: 0 5rem;
   display: flex;
   justify-content: space-between;
@@ -106,9 +104,9 @@
   cursor: pointer;
 }
 
-.icon-action:hover {
-  color: var(--text-white);
-  background: rgba(255, 255, 255, 0.05);
+.icon-action:hover, .icon-action.active {
+  color: var(--brand-teal);
+  background: rgba(25, 212, 168, 0.1);
 }
 
 .user-avatar-small {

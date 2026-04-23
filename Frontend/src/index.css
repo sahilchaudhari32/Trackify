@@ -15,6 +15,11 @@
   --text-gray: #9ca3af;
   --text-dim: #6b7280;
   
+  --chart-teal: #14b8a6;
+  --chart-pink: #f43f5e;
+  --chart-blue: #3b82f6;
+  --chart-gradient: linear-gradient(180deg, rgba(25, 212, 168, 0.2) 0%, rgba(25, 212, 168, 0) 100%);
+  
   --font-main: 'Outfit', sans-serif;
 }
 
@@ -27,7 +32,7 @@
 body {
   font-family: var(--font-main);
   background-color: var(--bg-black);
-  background-image: radial-gradient(circle at 50% -20%, #1c1d1f 0%, var(--bg-black) 80%);
+  background-image: radial-gradient(circle at 50% -10%, #151618 0%, var(--bg-black) 100%);
   color: var(--text-white);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;

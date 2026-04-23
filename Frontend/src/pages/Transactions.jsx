@@ -175,7 +175,7 @@ const Transactions = () => {
               </button>
             </div>
             <div className="health-bg-icon">
-              <Building2 size={80} opacity={0.05} />
+              <Building2 size={80} style={{ opacity: 0.05 }} />
             </div>
           </TiltCard>
         </aside>

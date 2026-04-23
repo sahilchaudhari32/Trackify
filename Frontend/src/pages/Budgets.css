@@ -1,0 +1,244 @@
+.budgets-root {
+  min-height: calc(100vh - 80px);
+  padding: 2rem 5rem;
+}
+
+.budgets-container {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 3rem;
+  width: 100%;
+}
+
+/* Header Section */
+.budgets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 3rem;
+}
+
+.header-title-group h2 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 0.5rem;
+}
+
+/* Budget Cards */
+.budget-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.budget-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.budget-card:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.card-info {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.category-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.amount-group {
+  text-align: right;
+}
+
+.current-amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.total-amount {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.status-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+}
+
+/* Progress Bar */
+.progress-container {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* Sidebar */
+.budgets-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.limit-card {
+  border-left: 4px solid var(--brand-teal);
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.sidebar-widget {
+  background: var(--bg-card);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.widget-icon-box {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: var(--text-dim);
+}
+
+.widget-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.widget-desc {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.widget-action {
+  width: 100%;
+  padding: 0.85rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+  color: var(--brand-teal);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+}
+
+.widget-action:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.smart-forecast {
+  background: linear-gradient(145deg, #18191b 0%, #111214 100%);
+}
+
+.forecast-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.forecast-highlight {
+  color: #f87171;
+  font-weight: 700;
+}
+
+.forecast-visual {
+  display: flex;
+  gap: 0.5rem;
+  height: 4px;
+}
+
+.forecast-bar {
+  flex: 1;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.forecast-bar.active {
+  background: var(--brand-teal);
+}
+
+.forecast-bar.warning {
+  background: #f87171;
+  opacity: 0.5;
+}
+
+.saving-opportunity .widget-action {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-white);
+}
+
+/* Colors */
+.text-cyan { color: var(--brand-teal); }
+.bg-cyan { background: var(--brand-teal); }
+.text-pink { color: #f87171; }
+.bg-pink { background: #f87171; }
+.text-green { color: var(--brand-emerald); }
+.bg-green { background: var(--brand-emerald); }
+
+@media (max-width: 1100px) {
+  .budgets-container {
+    grid-template-columns: 1fr;
+  }
+  .budgets-root {
+    padding: 2rem;
+  }
+}

@@ -68,10 +68,20 @@ const Header = () => {
 
         <div className="header-right">
           <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="icon-action"><Bell size={20} /></motion.button>
-          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="icon-action"><Settings size={20} /></motion.button>
-          <motion.div whileHover={{ scale: 1.1 }} className="user-avatar-small">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sahil" alt="User" />
-          </motion.div>
+          <NavLink to="/settings">
+            <motion.button 
+              whileHover={{ scale: 1.1 }} 
+              whileTap={{ scale: 0.9 }} 
+              className={`icon-action ${location.pathname === '/settings' ? 'active' : ''}`}
+            >
+              <Settings size={20} />
+            </motion.button>
+          </NavLink>
+          <NavLink to="/settings">
+            <motion.div whileHover={{ scale: 1.1 }} className="user-avatar-small">
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sahil" alt="User" />
+            </motion.div>
+          </NavLink>
         </div>
       </div>
     </header>
