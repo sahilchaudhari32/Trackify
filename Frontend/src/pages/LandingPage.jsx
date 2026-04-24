@@ -32,7 +32,9 @@ const PricingCard = ({ title, price, features, popular, btnText, secondary }) =>
     <div className="pricing-features">
       {features.map((f, i) => <div key={i} className="pricing-feature-item"><Check size={16} /> {f}</div>)}
     </div>
-    <button className={`btn-pricing ${secondary ? 'secondary' : 'primary'}`}>{btnText}</button>
+    <Link to="/login" className={`btn-pricing ${secondary ? 'secondary' : 'primary'}`} style={{ display: 'block', textDecoration: 'none' }}>
+      {btnText}
+    </Link>
   </motion.div>
 );
 
@@ -65,8 +67,8 @@ const Header = () => (
       {['Features', 'Analytics', 'Pricing'].map(item => <a key={item} href={`#${item.toLowerCase()}`} className="nav-link">{item}</a>)}
     </nav>
     <div className="header-actions">
-      <button className="btn-login">Login</button>
-      <button className="btn-get-started">Get Started</button>
+      <Link to="/login" className="btn-login">Login</Link>
+      <Link to="/login" className="btn-get-started">Get Started</Link>
     </div>
   </header>
 );
@@ -195,7 +197,7 @@ const LandingPage = () => {
       <motion.section className="cta-footer-section" variants={itemVariants}>
         <div className="cta-box">
           <h2>Start Tracking Your Money Today</h2><p>Join 50,000+ individuals who have mastered their financial future.</p>
-          <button className="btn-get-started" style={{ padding: '1rem 3rem', fontSize: '1.1rem' }}>Create Free Account</button>
+          <Link to="/login" className="btn-get-started" style={{ padding: '1rem 3rem', fontSize: '1.1rem', display: 'inline-block' }}>Create Free Account</Link>
         </div>
       </motion.section>
 
