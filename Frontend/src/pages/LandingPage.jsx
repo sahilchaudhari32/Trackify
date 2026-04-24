@@ -32,7 +32,7 @@ const PricingCard = ({ title, price, features, popular, btnText, secondary }) =>
     <div className="pricing-features">
       {features.map((f, i) => <div key={i} className="pricing-feature-item"><Check size={16} /> {f}</div>)}
     </div>
-    <Link to="/login" className={`btn-pricing ${secondary ? 'secondary' : 'primary'}`} style={{ display: 'block', textDecoration: 'none' }}>
+    <Link to="/signup" className={`btn-pricing ${secondary ? 'secondary' : 'primary'}`} style={{ display: 'block', textDecoration: 'none' }}>
       {btnText}
     </Link>
   </motion.div>
@@ -68,7 +68,7 @@ const Header = () => (
     </nav>
     <div className="header-actions">
       <Link to="/login" className="btn-login">Login</Link>
-      <Link to="/login" className="btn-get-started">Get Started</Link>
+      <Link to="/signup" className="btn-get-started">Get Started</Link>
     </div>
   </header>
 );
@@ -79,7 +79,7 @@ const Hero = () => (
     <motion.h1 className="hero-title">Your Financial Data. <span>Smarter.</span></motion.h1>
     <p className="hero-subtitle">Track transactions, analyze spending, and receive AI-powered insights in real time.</p>
     <div className="hero-cta">
-      <a href="#pricing" className="btn-hero-primary">Get Started Free <ArrowRight size={18} /></a>
+      <Link to="/signup" className="btn-hero-primary">Get Started Free <ArrowRight size={18} /></Link>
       <button className="btn-hero-secondary"><Play size={18} fill="white" /> Live Demo</button>
     </div>
     <div className="hero-image-wrapper">
@@ -197,7 +197,7 @@ const LandingPage = () => {
       <motion.section className="cta-footer-section" variants={itemVariants}>
         <div className="cta-box">
           <h2>Start Tracking Your Money Today</h2><p>Join 50,000+ individuals who have mastered their financial future.</p>
-          <Link to="/login" className="btn-get-started" style={{ padding: '1rem 3rem', fontSize: '1.1rem', display: 'inline-block' }}>Create Free Account</Link>
+          <Link to="/signup" className="btn-get-started" style={{ padding: '1rem 3rem', fontSize: '1.1rem', display: 'inline-block' }}>Create Free Account</Link>
         </div>
       </motion.section>
 

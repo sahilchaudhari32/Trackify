@@ -8,6 +8,7 @@ import Budgets from './pages/Budgets';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import './App.css';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<><Header /><div className="main-content"><Dashboard /></div></>} />
           <Route path="/transactions" element={<><Header /><div className="main-content"><Transactions /></div></>} />
           <Route path="/budgets" element={<><Header /><div className="main-content"><Budgets /></div></>} />

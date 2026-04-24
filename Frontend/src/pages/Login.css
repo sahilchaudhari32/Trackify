@@ -1,5 +1,5 @@
 .login-container {
-  position: fixed;
+  position: absolute;
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
@@ -60,7 +60,7 @@
   padding: 2.5rem;
   width: 100%;
   max-width: 500px;
-  margin-top: 2%;
+  margin-top: 1%;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
@@ -357,6 +357,74 @@
   color: var(--brand-teal);
   text-decoration: none;
   font-weight: 700;
+}
+
+/* Signup Specific Styles */
+.stats-chart-signup {
+  height: 140px;
+  gap: 0.5rem;
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chart-bar-wrapper-signup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chart-bar-signup {
+  width: 100%;
+  border-radius: 4px;
+}
+
+.chart-label-signup {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.social-proof-signup {
+  margin-top: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar-group-signup {
+  display: flex;
+  margin-left: 0.5rem;
+}
+
+.avatar-img-signup {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #0c0d0e;
+}
+
+.avatar-img-signup:not(:first-child) {
+  margin-left: -10px;
+}
+
+.social-proof-text-signup {
+  font-size: 0.85rem;
+  color: var(--text-gray);
+}
+
+.form-header-signup {
+  margin-bottom: 2rem;
+}
+
+.password-grid-signup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
 @media (max-width: 1100px) {

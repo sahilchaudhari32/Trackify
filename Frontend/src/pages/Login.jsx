@@ -94,18 +94,8 @@ const Login = () => {
           </div>
 
           <div className="tabs-container">
-            <div 
-              className={`tab ${activeTab === 'login' ? 'active' : ''}`} 
-              onClick={() => setActiveTab('login')}
-            >
-              Login
-            </div>
-            <div 
-              className={`tab ${activeTab === 'signup' ? 'active' : ''}`} 
-              onClick={() => setActiveTab('signup')}
-            >
-              Sign Up
-            </div>
+            <div className="tab active">Login</div>
+            <Link to="/signup" className="tab">Sign Up</Link>
           </div>
 
           <form className="login-form" onSubmit={handleLogin}>
@@ -149,7 +139,7 @@ const Login = () => {
           </button>
 
           <div className="form-footer">
-            Don't have an account? <a href="#">Start your 14-day free trial</a>
+            Don't have an account? <Link to="/signup" style={{ color: 'var(--brand-teal)', fontWeight: '700' }}>Start your 14-day free trial</Link>
           </div>
         </motion.div>
       </div>
