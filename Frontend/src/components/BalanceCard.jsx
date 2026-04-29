@@ -1,20 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, TrendingDown, TrendingUp } from 'lucide-react';
+import api from '../api/axios';
 import './BalanceCard.css';
 
 const BalanceCard = () => {
+  const [totals, setTotals] = useState({ balance: 0, income: 0, expense: 0 });
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  useEffect(() => {
+    const fetchTotals = async () => {
+      try {
+        const response = await api.get('/transactions');
+        const transactions = response.data;
+        
+        const income = transactions
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + t.amount, 0);
+        
+        const expense = transactions
+          .filter(t => t.type === 'expense')
+          .reduce((sum, t) => sum + t.amount, 0);
+
+        setTotals({
+          balance: income - expense,
+          income,
+          expense
+        });
+      } catch (err) {
+        console.error('Error fetching balance:', err);
+      }
+    };
+
+    fetchTotals();
+  }, []);
+
   return (
     <div className="balance-section">
       <div className="overview-label">
         <span className="label-text">OVERVIEW</span>
         <div className="greeting-row">
-          <h1 className="greeting-text">Good Evening, Sahil 👋</h1>
-          <div className="time-selector">
-            <button className="time-btn active">Daily</button>
-            <button className="time-btn">Weekly</button>
-            <button className="time-btn">Monthly</button>
-          </div>
+          <h1 className="greeting-text">Welcome back, {user.name?.split(' ')[0] || 'User'} 👋</h1>
         </div>
       </div>
 
@@ -26,30 +52,30 @@ const BalanceCard = () => {
         >
           <div className="card-top">
             <span className="text-label">TOTAL AVAILABLE BALANCE</span>
-            <div className="trend-badge">
-              <ArrowUpRight size={14} />
-              <span>+12.4%</span>
+            <div className="trend-badge" style={{ background: totals.balance >= 0 ? 'rgba(25, 212, 168, 0.1)' : 'rgba(248, 113, 113, 0.1)', color: totals.balance >= 0 ? 'var(--brand-teal)' : '#f87171' }}>
+              {totals.balance >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+              <span>{totals.balance >= 0 ? '+5.2%' : '-2.1%'}</span>
             </div>
           </div>
           
-          <h1 className="main-balance">₹4,82,950.00</h1>
+          <h1 className="main-balance">₹{totals.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</h1>
 
           <div className="sub-stats-grid">
             <div className="sub-stat">
-              <span className="sub-label">INCOME</span>
-              <span className="sub-value">₹1,24,000</span>
+              <span className="sub-label">TOTAL INCOME</span>
+              <span className="sub-value" style={{ color: 'var(--brand-teal)' }}>₹{totals.income.toLocaleString('en-IN')}</span>
             </div>
             <div className="sub-stat">
-              <span className="sub-label">EXPENSES</span>
-              <span className="sub-value">₹42,300</span>
+              <span className="sub-label">TOTAL EXPENSES</span>
+              <span className="sub-value" style={{ color: '#f87171' }}>₹{totals.expense.toLocaleString('en-IN')}</span>
             </div>
             <div className="sub-stat">
               <span className="sub-label">INVESTMENTS</span>
-              <span className="sub-value">₹65,000</span>
+              <span className="sub-value">₹0</span>
             </div>
             <div className="sub-stat">
               <span className="sub-label">TAX RESERVE</span>
-              <span className="sub-value">₹12,400</span>
+              <span className="sub-value">₹{(totals.income * 0.1).toLocaleString('en-IN')}</span>
             </div>
           </div>
         </motion.div>
@@ -62,8 +88,14 @@ const BalanceCard = () => {
               <path d="M10 22h4"></path>
             </svg>
           </div>
-          <p className="insight-text">You could save ₹12,400 this month by optimizing subscriptions.</p>
-          <p className="insight-sub">Our AI analyzed 14 recurring charges and found 3 overlaps in your streaming services.</p>
+          <p className="insight-text">
+            {totals.expense > totals.income ? 'Your spending exceeds your income.' : 'You are on track with your savings!'}
+          </p>
+          <p className="insight-sub">
+            {totals.expense > totals.income 
+              ? 'Try reducing non-essential expenses like Shopping or Dining.' 
+              : 'Our AI suggests increasing your Investment allocation by 5%.'}
+          </p>
           <button className="insight-link">VIEW DETAILS <span>→</span></button>
           
           <div className="net-prm-badge">

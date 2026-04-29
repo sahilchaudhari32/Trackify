@@ -2,28 +2,58 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, ArrowLeft, Shield, Eye, AtSign, TrendingUp } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../api/axios';
 import './Login.css';
 
 const Login = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    navigate('/dashboard');
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      
+      // Store token and user info
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify({
+        _id: response.data._id,
+        name: response.data.name,
+        email: response.data.email
+      }));
+
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="login-container">
       {/* Left Side - Brand & Hero */}
       <div className="login-left">
-        <div className="brand-logo">
-          <img src="https://www.image2url.com/r2/default/images/1776834249896-92b9b25d-757c-478a-99f8-2c6279cdb58e.png" alt="Trackify Logo" className="brand-icon" />
-          <span>Trackify</span>
-        </div>
+        <Link to="/" className="brand-logo" style={{ textDecoration: 'none' }}>
+          <motion.img 
+            src="https://www.image2url.com/r2/default/images/1776834249896-92b9b25d-757c-478a-99f8-2c6279cdb58e.png" 
+            alt="Trackify Logo" 
+            className="brand-icon"
+            whileHover={{ rotate: 180 }}
+            transition={{ duration: 0.6 }}
+          />
+          <motion.span whileHover={{ x: 5 }}>Trackify</motion.span>
+        </Link>
 
         <div className="hero-text">
-          <h1>Take control of your money.</h1>
+          <h1>Take control of <br /><span className="stat-green">your money.</span></h1>
           <p>The precision-grade wealth platform for data-literate professionals.</p>
         </div>
 
@@ -99,11 +129,22 @@ const Login = () => {
           </div>
 
           <form className="login-form" onSubmit={handleLogin}>
+            {error && (
+              <div style={{ color: '#f87171', fontSize: '0.85rem', marginBottom: '1rem', background: 'rgba(248, 113, 113, 0.1)', padding: '0.75rem', borderRadius: '8px' }}>
+                {error}
+              </div>
+            )}
             <div className="input-group">
               <label>Email Address</label>
               <div className="input-wrapper">
                 <AtSign className="input-icon" size={18} />
-                <input type="email" placeholder="name@company.com" required />
+                <input 
+                  type="email" 
+                  placeholder="name@company.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required 
+                />
               </div>
             </div>
 
@@ -114,7 +155,13 @@ const Login = () => {
               </div>
               <div className="input-wrapper">
                 <Lock className="input-icon" size={18} />
-                <input type="password" placeholder="••••••••" required />
+                <input 
+                  type="password" 
+                  placeholder="••••••••" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required 
+                />
                 <Eye className="input-icon-right" size={18} />
               </div>
             </div>
@@ -124,8 +171,8 @@ const Login = () => {
               <label htmlFor="remember">Keep me logged in for 30 days</label>
             </div>
 
-            <button type="submit" className="btn-login-main">
-              Login to Dashboard
+            <button type="submit" className="btn-login-main" disabled={loading}>
+              {loading ? 'Logging in...' : 'Login to Dashboard'}
             </button>
           </form>
 

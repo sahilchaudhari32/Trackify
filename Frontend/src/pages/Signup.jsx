@@ -2,22 +2,44 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, AtSign, TrendingUp, Shield, User, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../api/axios';
 import './Login.css';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError('Passwords do not match. Please try again.');
       return;
     }
     setError('');
-    navigate('/dashboard');
+    setLoading(true);
+
+    try {
+      const response = await api.post('/auth/register', { name, email, password });
+      
+      // Store token and user info
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify({
+        _id: response.data._id,
+        name: response.data.name,
+        email: response.data.email
+      }));
+
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL'];
@@ -48,15 +70,16 @@ const Signup = () => {
     <div className="login-container">
       {/* Left Side - Brand & Hero */}
       <div className="login-left">
-        <motion.div 
-          className="brand-logo"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <img src="https://www.image2url.com/r2/default/images/1776834249896-92b9b25d-757c-478a-99f8-2c6279cdb58e.png" alt="Trackify Logo" className="brand-icon" />
-          <span>Trackify</span>
-        </motion.div>
+        <Link to="/" className="brand-logo" style={{ textDecoration: 'none' }}>
+          <motion.img 
+            src="https://www.image2url.com/r2/default/images/1776834249896-92b9b25d-757c-478a-99f8-2c6279cdb58e.png" 
+            alt="Trackify Logo" 
+            className="brand-icon"
+            whileHover={{ rotate: 180 }}
+            transition={{ duration: 0.6 }}
+          />
+          <motion.span whileHover={{ x: 5 }}>Trackify</motion.span>
+        </Link>
 
         <motion.div 
           className="hero-text"
@@ -198,7 +221,13 @@ const Signup = () => {
               <label>Full Name</label>
               <div className="input-wrapper">
                 <User className="input-icon" size={18} />
-                <input type="text" placeholder="Enter your full name" required />
+                <input 
+                  type="text" 
+                  placeholder="Enter your full name" 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required 
+                />
               </div>
             </motion.div>
 
@@ -206,7 +235,13 @@ const Signup = () => {
               <label>Email Address</label>
               <div className="input-wrapper">
                 <AtSign className="input-icon" size={18} />
-                <input type="email" placeholder="name@company.com" required />
+                <input 
+                  type="email" 
+                  placeholder="name@company.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required 
+                />
               </div>
             </motion.div>
 
@@ -252,8 +287,9 @@ const Signup = () => {
               variants={itemVariants}
               whileHover={{ scale: 1.02, translateY: -2 }}
               whileTap={{ scale: 0.98 }}
+              disabled={loading}
             >
-              Create Account
+              {loading ? 'Creating Account...' : 'Create Account'}
             </motion.button>
           </form>
 

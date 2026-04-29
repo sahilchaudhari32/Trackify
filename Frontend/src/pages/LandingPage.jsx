@@ -80,7 +80,9 @@ const Hero = () => (
     <p className="hero-subtitle">Track transactions, analyze spending, and receive AI-powered insights in real time.</p>
     <div className="hero-cta">
       <Link to="/signup" className="btn-hero-primary">Get Started Free <ArrowRight size={18} /></Link>
-      <button className="btn-hero-secondary"><Play size={18} fill="white" /> Live Demo</button>
+      <Link to="/dashboard" className="btn-hero-secondary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Play size={18} fill="white" /> Live Demo
+      </Link>
     </div>
     <div className="hero-image-wrapper">
       <motion.img src="https://www.image2url.com/r2/default/images/1776945781312-cca83947-96b2-4d7e-8030-7826a05ce76c.png" className="hero-image" animate={{ y: [0, -20, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />
@@ -157,7 +159,10 @@ const LandingPage = () => {
             <div className="ai-badge"><Sparkles size={14} className="ai-sparkle" /> SMART AI RECOMMENDATION</div>
             <h2 className="ai-title">You can save <span>₹12,400</span> this month</h2>
             <p className="ai-description">Our AI detected that your spending on dining out is 24% higher than average.</p>
-            <div className="ai-actions"><button className="btn-ai-primary">Apply Saving Plan</button><button className="btn-ai-secondary">View Details</button></div>
+            <div className="ai-actions">
+              <Link to="/dashboard" className="btn-ai-primary" style={{ textDecoration: 'none' }}>Apply Saving Plan</Link>
+              <Link to="/analytics" className="btn-ai-secondary" style={{ textDecoration: 'none' }}>View Details</Link>
+            </div>
           </div>
           <div className="ai-content-right">
             <div className="budget-mini-card">
@@ -189,8 +194,8 @@ const LandingPage = () => {
         <div className="pricing-grid">
           <PricingCard title="Basic" price="₹0<span>/month</span>" features={['Up to 2 bank accounts', 'Manual expense logging', 'Basic monthly reports']} btnText="Join For Free" secondary />
           <PricingCard title="Pro" price="₹99<span>/month</span>" features={['Unlimited bank accounts', 'AI categorization', 'Savings insights', 'Priority support']} popular btnText="Get Full Access" />
-          <PricingCard title="Elite" price="$150<span>/month</span>" features={['Wealth management AI', 'Tax optimization tools', 'Multi-currency support', '1-on-1 advisor access']} btnText="Choose Elite" secondary />
-          <PricingCard title="Max" price="$250<span>/month</span>" features={['Custom API integration', 'Real-time market data', 'Dedicated account manager', 'Family account sharing']} btnText="Choose Max" secondary />
+          <PricingCard title="Elite" price="₹4,999<span>/month</span>" features={['Wealth management AI', 'Tax optimization tools', 'Multi-currency support', '1-on-1 advisor access']} btnText="Choose Elite" secondary />
+          <PricingCard title="Max" price="₹9,999<span>/month</span>" features={['Custom API integration', 'Real-time market data', 'Dedicated account manager', 'Family account sharing']} btnText="Choose Max" secondary />
         </div>
       </motion.section>
 

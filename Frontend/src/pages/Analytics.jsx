@@ -10,16 +10,48 @@ import {
   Search, 
   ArrowRight 
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import TiltCard from '../components/TiltCard';
+import Footer from '../components/Footer';
+import './Analytics.css';
+
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  TrendingUp, 
+  ArrowUpRight, 
+  ArrowDownRight, 
+  Wallet, 
+  ShoppingBag, 
+  Sparkles, 
+  Search, 
+  ArrowRight 
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import api from '../api/axios';
+import TiltCard from '../components/TiltCard';
+import Footer from '../components/Footer';
 import './Analytics.css';
 
 const Analytics = () => {
   const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState(null);
   const [timeframe, setTimeframe] = useState('Weekly');
+
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500);
-    return () => clearTimeout(timer);
+    const fetchSummary = async () => {
+      try {
+        const response = await api.get('/transactions/summary');
+        setSummary(response.data);
+      } catch (err) {
+        console.error('Failed to fetch summary:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSummary();
   }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -29,6 +61,7 @@ const Analytics = () => {
       }
     }
   };
+
   const itemVariants = {
     hidden: { opacity: 0, y: 40, rotateX: 15, scale: 0.95 },
     visible: { 
@@ -42,6 +75,7 @@ const Analytics = () => {
       }
     }
   };
+
   if (loading) {
     return (
       <div className="loading-overlay">
@@ -51,6 +85,11 @@ const Analytics = () => {
       </div>
     );
   }
+
+  const expenseRatio = summary?.totalIncome > 0 
+    ? (summary.totalExpense / summary.totalIncome) * 100 
+    : 100;
+
   return (
     <motion.div 
       className="dashboard-container analytics-container"
@@ -78,6 +117,7 @@ const Analytics = () => {
           </button>
         </div>
       </motion.div>
+
       <div className="analytics-grid">
         <motion.div variants={itemVariants}>
           <TiltCard className="h-full">
@@ -86,12 +126,12 @@ const Analytics = () => {
                 <div className="velocity-info">
                   <h3>Net Worth Velocity</h3>
                   <div className="velocity-amount">
-                    ₹4,82,450<span>.00</span>
+                    ₹{summary?.balance.toLocaleString('en-IN')}<span>.00</span>
                   </div>
                 </div>
                 <div className="growth-badge">
                   <TrendingUp size={14} />
-                  +12.4%
+                  {summary?.totalIncome > summary?.totalExpense ? '+8.2%' : '-2.4%'}
                 </div>
               </div>
               <div className="chart-bg">
@@ -110,10 +150,11 @@ const Analytics = () => {
             </div>
           </TiltCard>
         </motion.div>
+
         <motion.div variants={itemVariants}>
           <TiltCard className="h-full">
             <div className="glass-card allocation-card">
-              <h2>Allocation</h2>
+              <h2>Expense Allocation</h2>
               <div className="donut-container">
                 <svg width="200" height="200" viewBox="0 0 100 100">
                   <circle 
@@ -141,15 +182,15 @@ const Analytics = () => {
                     strokeWidth="10" 
                     strokeDasharray="251.2"
                     initial={{ strokeDashoffset: 251.2 }}
-                    animate={{ strokeDashoffset: 251.2 * (1 - 0.3) }}
+                    animate={{ strokeDashoffset: 251.2 * (1 - (expenseRatio / 100)) }}
                     transition={{ duration: 2, ease: "easeInOut", delay: 1 }}
                     strokeLinecap="round"
                     transform="rotate(160 50 50)"
                   />
                 </svg>
                 <div className="donut-info">
-                  <span>EXPENSES</span>
-                  <h4>30%</h4>
+                  <span>BURN RATE</span>
+                  <h4>{Math.round(expenseRatio)}%</h4>
                 </div>
               </div>
               <div className="legend">
@@ -158,29 +199,30 @@ const Analytics = () => {
                     <div className="dot" style={{ background: 'var(--brand-teal)' }}></div>
                     Income
                   </div>
-                  <div className="legend-right">₹1,24,000</div>
+                  <div className="legend-right">₹{summary?.totalIncome.toLocaleString('en-IN')}</div>
                 </div>
                 <div className="legend-item">
                   <div className="legend-left">
                     <div className="dot" style={{ background: 'var(--brand-rose)' }}></div>
                     Expenses
                   </div>
-                  <div className="legend-right">₹42,500</div>
+                  <div className="legend-right">₹{summary?.totalExpense.toLocaleString('en-IN')}</div>
                 </div>
                 <div className="legend-item">
                   <div className="legend-left">
                     <div className="dot" style={{ background: 'var(--text-dim)' }}></div>
-                    Investments
+                    Savings
                   </div>
-                  <div className="legend-right no-insights">No insights yet</div>
+                  <div className="legend-right">₹{summary?.balance.toLocaleString('en-IN')}</div>
                 </div>
               </div>
             </div>
           </TiltCard>
         </motion.div>
       </div>
+
       <div className="bottom-grid">
-        <div className="left-stack">
+        <div className="left-stack" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <motion.div variants={itemVariants}>
             <TiltCard>
               <div className="glass-card insight-card-small">
@@ -189,16 +231,17 @@ const Analytics = () => {
                     <Wallet size={20} />
                   </div>
                   <div className="insight-meta">
-                    <h4>Salary Credit</h4>
-                    <p>Corporate Payout • 14:20</p>
+                    <h4>Top Category</h4>
+                    <p>{summary?.categoryBreakdown[0]?.category || 'None'}</p>
                   </div>
                 </div>
                 <div className="insight-amount" style={{ color: 'var(--brand-teal)' }}>
-                  +₹85,000.00
+                  ₹{summary?.categoryBreakdown[0]?.amount.toLocaleString('en-IN') || 0}
                 </div>
               </div>
             </TiltCard>
           </motion.div>
+          
           <motion.div variants={itemVariants}>
             <TiltCard>
               <div className="glass-card insight-card-small" style={{ borderLeft: '3px solid var(--brand-rose)' }}>
@@ -207,17 +250,18 @@ const Analytics = () => {
                     <ShoppingBag size={20} />
                   </div>
                   <div className="insight-meta">
-                    <h4>Luxury Retails</h4>
-                    <p>Apple Store • 10:45</p>
+                    <h4>Avg. Daily Burn</h4>
+                    <p>Based on activity</p>
                   </div>
                 </div>
                 <div className="insight-amount">
-                  -₹1,24,900.00
+                  ₹{Math.round(summary?.totalExpense / 30).toLocaleString('en-IN')}
                 </div>
               </div>
             </TiltCard>
           </motion.div>
         </div>
+
         <motion.div variants={itemVariants}>
           <TiltCard className="h-full">
             <div className="glass-card intelligence-card">
@@ -228,16 +272,18 @@ const Analytics = () => {
               <div className="report-content">
                 <div className="report-text">
                   <p>
-                    Your spending in <b>Dining Out</b> has decreased by <span className="highlight">18%</span> compared to last week. This trajectory puts you on track to save an extra ₹12,000 this month.
+                    {summary?.balance > 0 
+                      ? `Your current trajectory shows a healthy ${Math.round((summary.balance / summary.totalIncome) * 100)}% savings rate. Keep this up to hit your goals early.`
+                      : 'Your spending is currently exceeding your income. Our AI recommends reviewing your recurring bills and shopping habits.'}
                   </p>
                   <div className="stat-row">
                     <div className="mini-stat">
                       <label>Savings Potential</label>
-                      <span className="teal">₹45,200</span>
+                      <span className="teal">₹{Math.round(summary?.balance * 0.2).toLocaleString('en-IN')}</span>
                     </div>
                     <div className="mini-stat">
                       <label>Burn Rate</label>
-                      <span className="rose">₹2,400/day</span>
+                      <span className="rose">₹{Math.round(summary?.totalExpense / 30).toLocaleString('en-IN')}/day</span>
                     </div>
                   </div>
                 </div>
@@ -246,29 +292,19 @@ const Analytics = () => {
                     <Search size={20} />
                   </div>
                   <h3>Investment Outlook</h3>
-                  <p>No insights yet. Sync your portfolio to see personalized growth trends.</p>
-                  <div className="connect-link">
-                    Connect Portfolio <ArrowRight size={14} />
-                  </div>
+                  <p>Based on your current balance of ₹{summary?.balance.toLocaleString('en-IN')}, you could diversify into low-risk bonds.</p>
+                  <Link to="/settings" className="connect-link" style={{ textDecoration: 'none' }}>
+                    Optimize Portfolio <ArrowRight size={14} />
+                  </Link>
                 </div>
               </div>
             </div>
           </TiltCard>
         </motion.div>
       </div>
-      <motion.footer 
-        className="analytics-footer" 
-        variants={itemVariants}
-      >
-        <span>© 2024 TRACKIFY ELITE. ALL RIGHTS RESERVED.</span>
-        <div className="footer-links-inline">
-          <span>Privacy Policy</span>
-          <span>Terms of Service</span>
-          <span>Security</span>
-          <span>Support</span>
-        </div>
-      </motion.footer>
+      <Footer />
     </motion.div>
   );
 };
+
 export default Analytics;

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   ShieldCheck, 
@@ -11,10 +11,11 @@ import {
   AlertTriangle,
   Pencil
 } from 'lucide-react';
+import api from '../api/axios';
+import Footer from '../components/Footer';
 import './Settings.css';
 
 // --- Reusable UI Components ---
-
 const GlassCard = ({ children, className = "" }) => (
   <div className={`settings-glass-card ${className}`}>
     {children}
@@ -65,11 +66,28 @@ const PreferenceCard = ({ icon: Icon, title, rows }) => (
   </div>
 );
 
-// --- Main Settings Page ---
-
 const Settings = () => {
+  const [user, setUser] = useState(null);
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [profileImage, setProfileImage] = useState("https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun");
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        setUser(storedUser);
+        const res = await api.get('/transactions/summary');
+        setSummary(res.data);
+      } catch (err) {
+        console.error('Error in settings:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -81,6 +99,8 @@ const Settings = () => {
   };
 
   const triggerFileInput = () => fileInputRef.current.click();
+
+  if (loading) return null;
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -99,9 +119,7 @@ const Settings = () => {
       variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
     >
       <div className="settings-grid">
-        
         <div className="settings-left-col">
-          
           <motion.div variants={itemVariants}>
             <GlassCard className="profile-card">
               <div className="profile-avatar-wrapper">
@@ -116,12 +134,12 @@ const Settings = () => {
                   <Pencil size={14} fill="currentColor" />
                 </motion.button>
               </div>
-              <h2 className="profile-name">Arjun Vardhan</h2>
-              <p className="profile-since">Elite Member Since 2021</p>
+              <h2 className="profile-name">{user?.name || 'Member'}</h2>
+              <p className="profile-since">{user?.email}</p>
               
               <div className="profile-stats-row">
-                <ProfileStat label="Total Assets" value="₹82,45,000" isTeal />
-                <ProfileStat label="Active Links" value="12" />
+                <ProfileStat label="Total Assets" value={`₹${summary?.balance.toLocaleString('en-IN') || 0}`} isTeal />
+                <ProfileStat label="Security" value="Elite" />
               </div>
             </GlassCard>
           </motion.div>
@@ -129,7 +147,6 @@ const Settings = () => {
           <motion.div variants={itemVariants}>
             <GlassCard className="security-card">
               <h3 className="security-title">Security Integrity</h3>
-              
               <div className="security-ring-wrapper">
                 <svg className="security-ring-svg" viewBox="0 0 176 176">
                   <circle cx="88" cy="88" r="78" fill="transparent" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
@@ -146,7 +163,6 @@ const Settings = () => {
                   <span className="security-label">Elite Protected</span>
                 </div>
               </div>
-
               <div className="security-badges">
                 <div className="security-badge-item">
                   <CheckCircle2 size={16} className="badge-icon" /> Biometric 2FA Active
@@ -158,6 +174,7 @@ const Settings = () => {
             </GlassCard>
           </motion.div>
         </div>
+
         <div className="settings-right-col">
           <motion.div variants={itemVariants} className="settings-section-card">
             <div className="section-header-row">
@@ -165,15 +182,11 @@ const Settings = () => {
                 <h2 className="section-heading">Financial Connections</h2>
                 <p className="section-subheading">Manage your linked accounts and data sync intervals.</p>
               </div>
-              <button className="link-account-btn">
-                Link New Account
-              </button>
+              <button className="link-account-btn">Link New Account</button>
             </div>
-
             <div className="connections-list">
-              <ConnectionItem icon={Landmark} name="HDFC Imperial Savings" meta="•••• 8829 | Last sync: 2m ago" amount="₹42,12,400" status="CONNECTED" />
-              <ConnectionItem icon={CreditCard} name="American Express Platinum" meta="•••• 1004 | Last sync: 1h ago" amount="₹8,45,000" status="CONNECTED" />
-              <ConnectionItem icon={Bitcoin} name="Coinbase Pro Wallet" meta="Sync paused due to API timeout" status="Re-authenticate" isError />
+              <ConnectionItem icon={Landmark} name="Primary Bank" meta="Linked via secure API" amount={`₹${summary?.totalIncome.toLocaleString('en-IN') || 0}`} status="CONNECTED" />
+              <ConnectionItem icon={CreditCard} name="Spend Account" meta="Real-time tracking" amount={`-₹${summary?.totalExpense.toLocaleString('en-IN') || 0}`} status="CONNECTED" />
             </div>
           </motion.div>
 
@@ -198,7 +211,7 @@ const Settings = () => {
                   <AlertTriangle size={24} className="privileged-icon" />
                   <div>
                     <h3 className="privileged-title">Privileged Actions</h3>
-                    <p className="privileged-desc">Download a full vault export or permanently de-provision this account and all connected metadata.</p>
+                    <p className="privileged-desc">Download a full vault export or permanently de-provision this account.</p>
                   </div>
                 </div>
                 <div className="privileged-actions">
@@ -210,21 +223,11 @@ const Settings = () => {
           </motion.div>
         </div>
       </div>
-      
-      <motion.footer 
-        variants={itemVariants}
-        className="settings-footer"
-      >
-        <span>© 2024 TRACKIFY ELITE. ALL RIGHTS RESERVED.</span>
-        <div className="settings-footer-links">
-          <span>Privacy Policy</span>
-          <span>Terms of Service</span>
-          <span>Security</span>
-          <span>Support</span>
-        </div>
-      </motion.footer>
+      <Footer />
     </motion.div>
   );
 };
+
+export default Settings;
 
 export default Settings;
