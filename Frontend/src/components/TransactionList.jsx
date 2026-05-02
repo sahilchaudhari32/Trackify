@@ -12,7 +12,8 @@ const TransactionList = () => {
     const fetchTransactions = async () => {
       try {
         const response = await api.get('/transactions');
-        setTransactions(response.data);
+        const transactionsData = Array.isArray(response?.transactions) ? response.transactions : [];
+        setTransactions(transactionsData);
       } catch (err) {
         console.error('Failed to fetch transactions:', err);
       } finally {

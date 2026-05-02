@@ -2,43 +2,59 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, ArrowLeft, Shield, Eye, AtSign, TrendingUp } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import toast from 'react-hot-toast';
+import { Helmet } from 'react-helmet-async';
+import { loginSuccess, loginStart, loginFailure } from '../store/slices/authSlice';
 import api from '../api/axios';
 import './Login.css';
 
+const LoginSchema = Yup.object().shape({
+  email: Yup.string().email('Invalid email address').required('Email is required'),
+  password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+});
+
 const Login = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema: LoginSchema,
+    onSubmit: async (values, { setSubmitting }) => {
+      dispatch(loginStart());
+      try {
+        const userData = await api.post('/auth/login', values);
+        
+        dispatch(loginSuccess({
+          user: { _id: userData._id, name: userData.name, email: userData.email },
+          token: userData.token
+        }));
 
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      
-      // Store token and user info
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify({
-        _id: response.data._id,
-        name: response.data.name,
-        email: response.data.email
-      }));
-
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+        toast.success('Successfully logged in!');
+        navigate('/dashboard');
+      } catch (err) {
+        const errorMsg = err.response?.data?.message || 'Something went wrong. Please try again.';
+        dispatch(loginFailure(errorMsg));
+        toast.error(errorMsg);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   return (
     <div className="login-container">
+      <Helmet>
+        <title>Login | Trackify</title>
+        <meta name="description" content="Login to Trackify to manage your wealth." />
+      </Helmet>
       {/* Left Side - Brand & Hero */}
       <div className="login-left">
         <Link to="/" className="brand-logo" style={{ textDecoration: 'none' }}>
@@ -128,24 +144,24 @@ const Login = () => {
             <Link to="/signup" className="tab">Sign Up</Link>
           </div>
 
-          <form className="login-form" onSubmit={handleLogin}>
-            {error && (
-              <div style={{ color: '#f87171', fontSize: '0.85rem', marginBottom: '1rem', background: 'rgba(248, 113, 113, 0.1)', padding: '0.75rem', borderRadius: '8px' }}>
-                {error}
-              </div>
-            )}
+          <form className="login-form" onSubmit={formik.handleSubmit}>
             <div className="input-group">
               <label>Email Address</label>
               <div className="input-wrapper">
                 <AtSign className="input-icon" size={18} />
                 <input 
                   type="email" 
+                  name="email"
                   placeholder="name@company.com" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required 
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  style={formik.touched.email && formik.errors.email ? { borderColor: '#f87171' } : {}}
                 />
               </div>
+              {formik.touched.email && formik.errors.email && (
+                <div style={{ color: '#f87171', fontSize: '0.8rem', marginTop: '0.25rem' }}>{formik.errors.email}</div>
+              )}
             </div>
 
             <div className="input-group">
@@ -156,14 +172,24 @@ const Login = () => {
               <div className="input-wrapper">
                 <Lock className="input-icon" size={18} />
                 <input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"}
+                  name="password"
                   placeholder="••••••••" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required 
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  style={formik.touched.password && formik.errors.password ? { borderColor: '#f87171' } : {}}
                 />
-                <Eye className="input-icon-right" size={18} />
+                <Eye 
+                  className="input-icon-right" 
+                  size={18} 
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setShowPassword(!showPassword)}
+                />
               </div>
+              {formik.touched.password && formik.errors.password && (
+                <div style={{ color: '#f87171', fontSize: '0.8rem', marginTop: '0.25rem' }}>{formik.errors.password}</div>
+              )}
             </div>
 
             <div className="checkbox-group">
@@ -171,8 +197,8 @@ const Login = () => {
               <label htmlFor="remember">Keep me logged in for 30 days</label>
             </div>
 
-            <button type="submit" className="btn-login-main" disabled={loading}>
-              {loading ? 'Logging in...' : 'Login to Dashboard'}
+            <button type="submit" className="btn-login-main" disabled={formik.isSubmitting}>
+              {formik.isSubmitting ? 'Logging in...' : 'Login to Dashboard'}
             </button>
           </form>
 

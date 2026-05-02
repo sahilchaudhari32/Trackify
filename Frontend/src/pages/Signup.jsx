@@ -1,73 +1,89 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, AtSign, TrendingUp, Shield, User, AlertCircle } from 'lucide-react';
+import { Lock, AtSign, TrendingUp, Shield, User, AlertCircle, Eye } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import toast from 'react-hot-toast';
+import { Helmet } from 'react-helmet-async';
+import { loginSuccess, loginStart, loginFailure } from '../store/slices/authSlice';
 import api from '../api/axios';
 import './Login.css';
 
+const SignupSchema = Yup.object().shape({
+  name: Yup.string().required('Name is required'),
+  email: Yup.string().email('Invalid email address').required('Email is required'),
+  password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password'), null], 'Passwords must match')
+    .required('Confirm Password is required'),
+  terms: Yup.boolean().oneOf([true], 'You must accept the terms and conditions'),
+});
+
 const Signup = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      setError('Passwords do not match. Please try again.');
-      return;
-    }
-    setError('');
-    setLoading(true);
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      terms: false,
+    },
+    validationSchema: SignupSchema,
+    onSubmit: async (values, { setSubmitting }) => {
+      dispatch(loginStart());
+      try {
+        const userData = await api.post('/auth/signup', { 
+          name: values.name, 
+          email: values.email, 
+          password: values.password 
+        });
 
-    try {
-      const response = await api.post('/auth/register', { name, email, password });
-      
-      // Store token and user info
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify({
-        _id: response.data._id,
-        name: response.data.name,
-        email: response.data.email
-      }));
+        dispatch(loginSuccess({
+          user: { _id: userData._id, name: userData.name, email: userData.email },
+          token: userData.token
+        }));
 
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+        toast.success('Account created successfully!');
+        navigate('/dashboard');
+      } catch (err) {
+        const errorMsg = err.response?.data?.message || 'Something went wrong. Please try again.';
+        dispatch(loginFailure(errorMsg));
+        toast.error(errorMsg);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL'];
   const chartData = [35, 55, 45, 65, 60, 85, 100];
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
       opacity: 1,
-      transition: { 
-        staggerChildren: 0.1,
-        delayChildren: 0.3
-      }
+      transition: { staggerChildren: 0.1, delayChildren: 0.3 }
     }
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" }
-    }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
   };
 
   return (
     <div className="login-container">
+      <Helmet>
+        <title>Sign Up | Trackify</title>
+        <meta name="description" content="Create a new Trackify account." />
+      </Helmet>
       {/* Left Side - Brand & Hero */}
       <div className="login-left">
         <Link to="/" className="brand-logo" style={{ textDecoration: 'none' }}>
@@ -81,12 +97,7 @@ const Signup = () => {
           <motion.span whileHover={{ x: 5 }}>Trackify</motion.span>
         </Link>
 
-        <motion.div 
-          className="hero-text"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
+        <motion.div className="hero-text" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
           <h1>Take control of <br /><span className="stat-green">your money.</span></h1>
           <p>
             Precision-grade wealth management for the modern investor. Track assets, 
@@ -95,24 +106,13 @@ const Signup = () => {
         </motion.div>
 
         {/* Portfolio Stats Card */}
-        <motion.div 
-          className="login-stats-card"
-          initial={{ opacity: 0, scale: 0.9, y: 40 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          whileHover={{ y: -5, transition: { duration: 0.3 } }}
-        >
+        <motion.div className="login-stats-card" initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} whileHover={{ y: -5, transition: { duration: 0.3 } }}>
           <div className="stats-card-main">
             <div>
               <div className="stats-card-label">TOTAL PORTFOLIO VALUE</div>
               <h2>$1,284,592.40</h2>
             </div>
-            <motion.div 
-              className="growth-tag"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.2 }}
-            >
+            <motion.div className="growth-tag" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.2 }}>
               <TrendingUp size={12} /> +12.4%
             </motion.div>
           </div>
@@ -120,12 +120,7 @@ const Signup = () => {
           <div className="stats-chart-signup">
             {chartData.map((h, i) => (
               <div key={i} className="chart-bar-wrapper-signup">
-                <motion.div 
-                  className={`chart-bar chart-bar-signup ${i === chartData.length - 1 ? 'active' : ''}`}
-                  initial={{ height: 0 }}
-                  animate={{ height: `${h}%` }}
-                  transition={{ duration: 1, delay: 0.8 + (i * 0.1) }}
-                />
+                <motion.div className={`chart-bar chart-bar-signup ${i === chartData.length - 1 ? 'active' : ''}`} initial={{ height: 0 }} animate={{ height: `${h}%` }} transition={{ duration: 1, delay: 0.8 + (i * 0.1) }} />
                 <span className="chart-label-signup">{months[i]}</span>
               </div>
             ))}
@@ -133,54 +128,25 @@ const Signup = () => {
         </motion.div>
 
         {/* Social Proof */}
-        <motion.div 
-          className="social-proof-signup"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-        >
+        <motion.div className="social-proof-signup" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}>
           <div className="avatar-group-signup">
             {[1, 2, 3].map((i) => (
-              <motion.img 
-                key={i}
-                src={`https://randomuser.me/api/portraits/men/${i + 10}.jpg`} 
-                alt="user" 
-                className="avatar-img-signup"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.6 + (i * 0.1) }}
-                whileHover={{ y: -5, scale: 1.1, zIndex: 10 }}
-              />
+              <motion.img key={i} src={`https://randomuser.me/api/portraits/men/${i + 10}.jpg`} alt="user" className="avatar-img-signup" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.6 + (i * 0.1) }} whileHover={{ y: -5, scale: 1.1, zIndex: 10 }} />
             ))}
           </div>
-          <span className="social-proof-text-signup">
-            Trusted by 10,000+ users worldwide
-          </span>
+          <span className="social-proof-text-signup">Trusted by 10,000+ users worldwide</span>
         </motion.div>
 
-        <motion.div 
-          className="left-security-footer"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.8 }}
-        >
-          <div className="security-item">
-            <Shield size={14} className="stat-green" /> Bank-level security
-          </div>
+        <motion.div className="left-security-footer" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}>
+          <div className="security-item"><Shield size={14} className="stat-green" /> Bank-level security</div>
           <span>•</span>
-          <div className="security-item">
-            <Lock size={14} className="stat-green" /> Encrypted financial data
-          </div>
+          <div className="security-item"><Lock size={14} className="stat-green" /> Encrypted financial data</div>
         </motion.div>
       </div>
 
       {/* Right Side - Form */}
       <div className="login-right">
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <motion.div variants={containerVariants} initial="hidden" animate="visible">
           <motion.div className="tabs-container" variants={itemVariants}>
             <Link to="/login" className="tab">Login</Link>
             <div className="tab active">Sign Up</div>
@@ -191,58 +157,23 @@ const Signup = () => {
             <p>Start managing your wealth with precision today.</p>
           </motion.div>
 
-          <form className="login-form" onSubmit={handleSignup}>
-            <AnimatePresence>
-              {error && (
-                <motion.div 
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="error-message-auth"
-                  style={{ 
-                    color: '#f87171', 
-                    fontSize: '0.85rem', 
-                    background: 'rgba(248, 113, 113, 0.1)', 
-                    padding: '0.75rem', 
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    marginBottom: '1rem'
-                  }}
-                >
-                  <AlertCircle size={16} />
-                  {error}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
+          <form className="login-form" onSubmit={formik.handleSubmit}>
             <motion.div className="input-group" variants={itemVariants}>
               <label>Full Name</label>
               <div className="input-wrapper">
                 <User className="input-icon" size={18} />
-                <input 
-                  type="text" 
-                  placeholder="Enter your full name" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required 
-                />
+                <input type="text" name="name" placeholder="Enter your full name" value={formik.values.name} onChange={formik.handleChange} onBlur={formik.handleBlur} style={formik.touched.name && formik.errors.name ? { borderColor: '#f87171' } : {}} />
               </div>
+              {formik.touched.name && formik.errors.name && <div style={{ color: '#f87171', fontSize: '0.8rem', marginTop: '0.25rem' }}>{formik.errors.name}</div>}
             </motion.div>
 
             <motion.div className="input-group" variants={itemVariants}>
               <label>Email Address</label>
               <div className="input-wrapper">
                 <AtSign className="input-icon" size={18} />
-                <input 
-                  type="email" 
-                  placeholder="name@company.com" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required 
-                />
+                <input type="email" name="email" placeholder="name@company.com" value={formik.values.email} onChange={formik.handleChange} onBlur={formik.handleBlur} style={formik.touched.email && formik.errors.email ? { borderColor: '#f87171' } : {}} />
               </div>
+              {formik.touched.email && formik.errors.email && <div style={{ color: '#f87171', fontSize: '0.8rem', marginTop: '0.25rem' }}>{formik.errors.email}</div>}
             </motion.div>
 
             <motion.div className="password-grid-signup" variants={itemVariants}>
@@ -250,46 +181,32 @@ const Signup = () => {
                 <label>Password</label>
                 <div className="input-wrapper">
                   <Lock className="input-icon" size={18} />
-                  <input 
-                    type="password" 
-                    placeholder="••••••••" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required 
-                  />
+                  <input type={showPassword ? "text" : "password"} name="password" placeholder="••••••••" value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur} style={formik.touched.password && formik.errors.password ? { borderColor: '#f87171' } : {}} />
+                  <Eye className="input-icon-right" size={18} style={{ cursor: 'pointer' }} onClick={() => setShowPassword(!showPassword)} />
                 </div>
+                {formik.touched.password && formik.errors.password && <div style={{ color: '#f87171', fontSize: '0.8rem', marginTop: '0.25rem' }}>{formik.errors.password}</div>}
               </div>
               <div className="input-group">
                 <label>Confirm Password</label>
                 <div className="input-wrapper">
                   <Lock className="input-icon" size={18} />
-                  <input 
-                    type="password" 
-                    placeholder="••••••••" 
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required 
-                  />
+                  <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="••••••••" value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur} style={formik.touched.confirmPassword && formik.errors.confirmPassword ? { borderColor: '#f87171' } : {}} />
+                  <Eye className="input-icon-right" size={18} style={{ cursor: 'pointer' }} onClick={() => setShowConfirmPassword(!showConfirmPassword)} />
                 </div>
+                {formik.touched.confirmPassword && formik.errors.confirmPassword && <div style={{ color: '#f87171', fontSize: '0.8rem', marginTop: '0.25rem' }}>{formik.errors.confirmPassword}</div>}
               </div>
             </motion.div>
 
             <motion.div className="checkbox-group" variants={itemVariants}>
-              <input type="checkbox" id="terms" required />
+              <input type="checkbox" id="terms" name="terms" checked={formik.values.terms} onChange={formik.handleChange} onBlur={formik.handleBlur} />
               <label htmlFor="terms">
                 I agree to the <a href="#" className="forgot-link">Terms of Service</a> and <a href="#" className="forgot-link">Privacy Policy</a>.
               </label>
+              {formik.touched.terms && formik.errors.terms && <div style={{ color: '#f87171', fontSize: '0.8rem', marginTop: '0.25rem' }}>{formik.errors.terms}</div>}
             </motion.div>
 
-            <motion.button 
-              type="submit" 
-              className="btn-login-main" 
-              variants={itemVariants}
-              whileHover={{ scale: 1.02, translateY: -2 }}
-              whileTap={{ scale: 0.98 }}
-              disabled={loading}
-            >
-              {loading ? 'Creating Account...' : 'Create Account'}
+            <motion.button type="submit" className="btn-login-main" variants={itemVariants} whileHover={{ scale: 1.02, translateY: -2 }} whileTap={{ scale: 0.98 }} disabled={formik.isSubmitting}>
+              {formik.isSubmitting ? 'Creating Account...' : 'Create Account'}
             </motion.button>
           </form>
 
@@ -297,12 +214,7 @@ const Signup = () => {
             <span className="divider-text">OR CONTINUE WITH</span>
           </motion.div>
 
-          <motion.button 
-            className="btn-google" 
-            variants={itemVariants}
-            whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-            whileTap={{ scale: 0.98 }}
-          >
+          <motion.button className="btn-google" variants={itemVariants} whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.1)" }} whileTap={{ scale: 0.98 }}>
             <img src="https://www.google.com/favicon.ico" alt="Google" width="16" height="16" />
             Continue with Google
           </motion.button>

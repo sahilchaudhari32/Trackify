@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import BalanceCard from '../components/BalanceCard';
 import SpendingOverview from '../components/SpendingOverview';
 import TransactionList from '../components/TransactionList';
@@ -18,6 +19,9 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-root">
+      <Helmet>
+        <title>Dashboard | Trackify</title>
+      </Helmet>
       <main className="dashboard-container">
         <BalanceCard key={`balance-${refreshKey}`} />
         <SpendingOverview key={`spending-${refreshKey}`} />

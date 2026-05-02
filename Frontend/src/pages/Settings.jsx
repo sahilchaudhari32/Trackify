@@ -1,23 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { 
   ShieldCheck, 
   CheckCircle2, 
   Landmark, 
   CreditCard, 
-  Bitcoin, 
   Globe, 
   Bell, 
   AlertTriangle,
-  Pencil
+  Pencil,
+  UploadCloud
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../api/axios';
 import Footer from '../components/Footer';
 import './Settings.css';
 
 // --- Reusable UI Components ---
-const GlassCard = ({ children, className = "" }) => (
-  <div className={`settings-glass-card ${className}`}>
+const GlassCard = ({ children, className = "", ...props }) => (
+  <div className={`settings-glass-card ${className}`} {...props}>
     {children}
   </div>
 );
@@ -70,7 +72,8 @@ const Settings = () => {
   const [user, setUser] = useState(null);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [profileImage, setProfileImage] = useState("https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun");
+  const [profileImage, setProfileImage] = useState(localStorage.getItem('profileImage') || "https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun");
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -78,8 +81,8 @@ const Settings = () => {
       try {
         const storedUser = JSON.parse(localStorage.getItem('user'));
         setUser(storedUser);
-        const res = await api.get('/transactions/summary');
-        setSummary(res.data);
+        const summaryData = await api.get('/summary');
+        setSummary(summaryData);
       } catch (err) {
         console.error('Error in settings:', err);
       } finally {
@@ -89,12 +92,50 @@ const Settings = () => {
     fetchData();
   }, []);
 
+  const processFile = (file) => {
+    if (!file) return;
+    
+    // Validation
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Invalid file type. Please upload an image (JPG, PNG, GIF, WEBP).');
+      return;
+    }
+    
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error('File is too large. Maximum size is 5MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfileImage(reader.result);
+      localStorage.setItem('profileImage', reader.result);
+      toast.success('Profile picture updated successfully!');
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setProfileImage(reader.result);
-      reader.readAsDataURL(file);
+    processFile(e.target.files[0]);
+  };
+
+  const onDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const onDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const onDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFile(e.dataTransfer.files[0]);
     }
   };
 
@@ -118,12 +159,22 @@ const Settings = () => {
       animate="visible"
       variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
     >
+      <Helmet>
+        <title>Settings | Trackify</title>
+      </Helmet>
       <div className="settings-grid">
         <div className="settings-left-col">
           <motion.div variants={itemVariants}>
-            <GlassCard className="profile-card">
+            <GlassCard 
+              className={`profile-card ${isDragging ? 'dragging' : ''}`}
+              onDragOver={onDragOver}
+              onDragLeave={onDragLeave}
+              onDrop={onDrop}
+              style={{ border: isDragging ? '2px dashed var(--brand-teal)' : '1px solid rgba(255, 255, 255, 0.05)' }}
+            >
               <div className="profile-avatar-wrapper">
-                <img src={profileImage} alt="Profile" className="profile-avatar" />
+                <img src={profileImage} alt="Profile" className="profile-avatar" style={{ opacity: isDragging ? 0.5 : 1 }} />
+                {isDragging && <UploadCloud size={32} className="drag-upload-icon" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--brand-teal)' }} />}
                 <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden-input" />
                 <motion.button 
                   whileHover={{ scale: 1.1 }} 
@@ -138,7 +189,7 @@ const Settings = () => {
               <p className="profile-since">{user?.email}</p>
               
               <div className="profile-stats-row">
-                <ProfileStat label="Total Assets" value={`₹${summary?.balance.toLocaleString('en-IN') || 0}`} isTeal />
+                <ProfileStat label="Total Assets" value={`₹${(summary?.balance || 0).toLocaleString('en-IN')}`} isTeal />
                 <ProfileStat label="Security" value="Elite" />
               </div>
             </GlassCard>
@@ -185,8 +236,8 @@ const Settings = () => {
               <button className="link-account-btn">Link New Account</button>
             </div>
             <div className="connections-list">
-              <ConnectionItem icon={Landmark} name="Primary Bank" meta="Linked via secure API" amount={`₹${summary?.totalIncome.toLocaleString('en-IN') || 0}`} status="CONNECTED" />
-              <ConnectionItem icon={CreditCard} name="Spend Account" meta="Real-time tracking" amount={`-₹${summary?.totalExpense.toLocaleString('en-IN') || 0}`} status="CONNECTED" />
+              <ConnectionItem icon={Landmark} name="Primary Bank" meta="Linked via secure API" amount={`₹${(summary?.totalIncome || 0).toLocaleString('en-IN')}`} status="CONNECTED" />
+              <ConnectionItem icon={CreditCard} name="Spend Account" meta="Real-time tracking" amount={`-₹${(summary?.totalExpense || 0).toLocaleString('en-IN')}`} status="CONNECTED" />
             </div>
           </motion.div>
 
@@ -227,7 +278,5 @@ const Settings = () => {
     </motion.div>
   );
 };
-
-export default Settings;
 
 export default Settings;

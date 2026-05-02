@@ -10,7 +10,7 @@ const SpendingOverview = () => {
     const fetchAndProcessData = async () => {
       try {
         const response = await api.get('/transactions');
-        const transactions = response.data;
+        const transactions = Array.isArray(response?.transactions) ? response.transactions : [];
 
         // Group by day of week
         const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];

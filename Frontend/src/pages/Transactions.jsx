@@ -31,10 +31,11 @@ const Transactions = () => {
       try {
         const [transRes, summaryRes] = await Promise.all([
           api.get('/transactions'),
-          api.get('/transactions/summary')
+          api.get('/summary')
         ]);
-        setTransactions(transRes.data);
-        setSummary(summaryRes.data);
+
+        setTransactions(Array.isArray(transRes?.transactions) ? transRes.transactions : []);
+        setSummary(summaryRes);
       } catch (err) {
         console.error('Error fetching transactions:', err);
       } finally {
@@ -128,7 +129,7 @@ const Transactions = () => {
           <TiltCard className="balance-card-wrapper">
             <div className="balance-card-glass">
               <p className="text-label">NET BALANCE</p>
-              <h2 className="balance-amount">₹ {summary?.balance.toLocaleString('en-IN')}</h2>
+              <h2 className="balance-amount">₹ {summary?.balance?.toLocaleString('en-IN') || 0}</h2>
               <div className="balance-progress-container">
                 <div className="progress-bar">
                   <motion.div 
@@ -139,8 +140,8 @@ const Transactions = () => {
                   />
                 </div>
                 <div className="progress-labels">
-                  <span className="income-label">IN: ₹ {summary?.totalIncome.toLocaleString('en-IN')}</span>
-                  <span className="expense-label">OUT: ₹ {summary?.totalExpense.toLocaleString('en-IN')}</span>
+                  <span className="income-label">IN: ₹ {summary?.totalIncome?.toLocaleString('en-IN') || 0}</span>
+                  <span className="expense-label">OUT: ₹ {summary?.totalExpense?.toLocaleString('en-IN') || 0}</span>
                 </div>
               </div>
             </div>
@@ -182,7 +183,5 @@ const Transactions = () => {
     </div>
   );
 };
-
-export default Transactions;
 
 export default Transactions;

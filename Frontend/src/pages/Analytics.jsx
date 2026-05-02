@@ -1,26 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   TrendingUp, 
-  ArrowUpRight, 
-  ArrowDownRight, 
-  Wallet, 
-  ShoppingBag, 
-  Sparkles, 
-  Search, 
-  ArrowRight 
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
-import TiltCard from '../components/TiltCard';
-import Footer from '../components/Footer';
-import './Analytics.css';
-
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  TrendingUp, 
-  ArrowUpRight, 
-  ArrowDownRight, 
   Wallet, 
   ShoppingBag, 
   Sparkles, 
@@ -41,8 +22,8 @@ const Analytics = () => {
   useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const response = await api.get('/transactions/summary');
-        setSummary(response.data);
+        const summaryData = await api.get('/summary');
+        setSummary(summaryData);
       } catch (err) {
         console.error('Failed to fetch summary:', err);
       } finally {
@@ -126,7 +107,7 @@ const Analytics = () => {
                 <div className="velocity-info">
                   <h3>Net Worth Velocity</h3>
                   <div className="velocity-amount">
-                    ₹{summary?.balance.toLocaleString('en-IN')}<span>.00</span>
+                    ₹{(summary?.balance || 0).toLocaleString('en-IN')}<span>.00</span>
                   </div>
                 </div>
                 <div className="growth-badge">
@@ -199,21 +180,21 @@ const Analytics = () => {
                     <div className="dot" style={{ background: 'var(--brand-teal)' }}></div>
                     Income
                   </div>
-                  <div className="legend-right">₹{summary?.totalIncome.toLocaleString('en-IN')}</div>
+                  <div className="legend-right">₹{(summary?.totalIncome || 0).toLocaleString('en-IN')}</div>
                 </div>
                 <div className="legend-item">
                   <div className="legend-left">
                     <div className="dot" style={{ background: 'var(--brand-rose)' }}></div>
                     Expenses
                   </div>
-                  <div className="legend-right">₹{summary?.totalExpense.toLocaleString('en-IN')}</div>
+                  <div className="legend-right">₹{(summary?.totalExpense || 0).toLocaleString('en-IN')}</div>
                 </div>
                 <div className="legend-item">
                   <div className="legend-left">
                     <div className="dot" style={{ background: 'var(--text-dim)' }}></div>
                     Savings
                   </div>
-                  <div className="legend-right">₹{summary?.balance.toLocaleString('en-IN')}</div>
+                  <div className="legend-right">₹{(summary?.balance || 0).toLocaleString('en-IN')}</div>
                 </div>
               </div>
             </div>
@@ -232,11 +213,11 @@ const Analytics = () => {
                   </div>
                   <div className="insight-meta">
                     <h4>Top Category</h4>
-                    <p>{summary?.categoryBreakdown[0]?.category || 'None'}</p>
+                    <p>{summary?.categoryBreakdown?.[0]?.category || 'None'}</p>
                   </div>
                 </div>
                 <div className="insight-amount" style={{ color: 'var(--brand-teal)' }}>
-                  ₹{summary?.categoryBreakdown[0]?.amount.toLocaleString('en-IN') || 0}
+                  ₹{(summary?.categoryBreakdown?.[0]?.amount || 0).toLocaleString('en-IN')}
                 </div>
               </div>
             </TiltCard>
@@ -255,7 +236,7 @@ const Analytics = () => {
                   </div>
                 </div>
                 <div className="insight-amount">
-                  ₹{Math.round(summary?.totalExpense / 30).toLocaleString('en-IN')}
+                  ₹{Math.round((summary?.totalExpense || 0) / 30).toLocaleString('en-IN')}
                 </div>
               </div>
             </TiltCard>
@@ -272,18 +253,18 @@ const Analytics = () => {
               <div className="report-content">
                 <div className="report-text">
                   <p>
-                    {summary?.balance > 0 
-                      ? `Your current trajectory shows a healthy ${Math.round((summary.balance / summary.totalIncome) * 100)}% savings rate. Keep this up to hit your goals early.`
+                    {(summary?.balance || 0) > 0 
+                      ? `Your current trajectory shows a healthy ${Math.round(((summary?.balance || 0) / (summary?.totalIncome || 1)) * 100)}% savings rate. Keep this up to hit your goals early.`
                       : 'Your spending is currently exceeding your income. Our AI recommends reviewing your recurring bills and shopping habits.'}
                   </p>
                   <div className="stat-row">
                     <div className="mini-stat">
                       <label>Savings Potential</label>
-                      <span className="teal">₹{Math.round(summary?.balance * 0.2).toLocaleString('en-IN')}</span>
+                      <span className="teal">₹{Math.round((summary?.balance || 0) * 0.2).toLocaleString('en-IN')}</span>
                     </div>
                     <div className="mini-stat">
                       <label>Burn Rate</label>
-                      <span className="rose">₹{Math.round(summary?.totalExpense / 30).toLocaleString('en-IN')}/day</span>
+                      <span className="rose">₹{Math.round((summary?.totalExpense || 0) / 30).toLocaleString('en-IN')}/day</span>
                     </div>
                   </div>
                 </div>
@@ -292,7 +273,7 @@ const Analytics = () => {
                     <Search size={20} />
                   </div>
                   <h3>Investment Outlook</h3>
-                  <p>Based on your current balance of ₹{summary?.balance.toLocaleString('en-IN')}, you could diversify into low-risk bonds.</p>
+                  <p>Based on your current balance of ₹{(summary?.balance || 0).toLocaleString('en-IN')}, you could diversify into low-risk bonds.</p>
                   <Link to="/settings" className="connect-link" style={{ textDecoration: 'none' }}>
                     Optimize Portfolio <ArrowRight size={14} />
                   </Link>

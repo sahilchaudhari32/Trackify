@@ -9,30 +9,21 @@ const BalanceCard = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
-    const fetchTotals = async () => {
+    const fetchSummary = async () => {
       try {
-        const response = await api.get('/transactions');
-        const transactions = response.data;
-        
-        const income = transactions
-          .filter(t => t.type === 'income')
-          .reduce((sum, t) => sum + t.amount, 0);
-        
-        const expense = transactions
-          .filter(t => t.type === 'expense')
-          .reduce((sum, t) => sum + t.amount, 0);
+        const summary = await api.get('/summary');
 
         setTotals({
-          balance: income - expense,
-          income,
-          expense
+          balance: summary.balance || 0,
+          income: summary.totalIncome || 0,
+          expense: summary.totalExpense || 0
         });
       } catch (err) {
-        console.error('Error fetching balance:', err);
+        console.error('Error fetching summary:', err);
       }
     };
 
-    fetchTotals();
+    fetchSummary();
   }, []);
 
   return (

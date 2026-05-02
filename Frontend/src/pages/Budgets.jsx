@@ -5,8 +5,6 @@ import {
   ShoppingBag, 
   PiggyBank, 
   Calendar, 
-  Zap, 
-  Lightbulb, 
   Plus, 
   X,
   TrendingUp,
@@ -30,14 +28,16 @@ const Budgets = () => {
 
   const categories = ['Food', 'Travel', 'Bills', 'Shopping', 'Investment', 'Other'];
 
-  const fetchAllData = async () => {
+  const loadBudgetData = async () => {
+    setLoading(true);
     try {
       const [budgetRes, transRes] = await Promise.all([
         api.get('/budget'),
         api.get('/transactions')
       ]);
-      setBudgets(budgetRes.data);
-      setTransactions(transRes.data);
+
+      setBudgets(Array.isArray(budgetRes) ? budgetRes : []);
+      setTransactions(Array.isArray(transRes?.transactions) ? transRes.transactions : []);
     } catch (err) {
       console.error('Failed to fetch budget data:', err);
     } finally {
@@ -46,7 +46,11 @@ const Budgets = () => {
   };
 
   useEffect(() => {
-    fetchAllData();
+    const timeoutId = window.setTimeout(() => {
+      void loadBudgetData();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const handleSetBudget = async (e) => {
@@ -58,7 +62,7 @@ const Budgets = () => {
       });
       setIsModalOpen(false);
       setNewLimit('');
-      fetchAllData();
+      await loadBudgetData();
     } catch (err) {
       console.error('Error setting budget:', err);
     }
@@ -197,7 +201,7 @@ const Budgets = () => {
           <div className="limit-card">
             <span className="text-label">TOTAL MONTHLY LIMIT</span>
             <div className="flex-between" style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '2rem' }}>₹{totalMonthlyLimit.toLocaleString()}</h2>
+              <h2 style={{ fontSize: '2rem' }}>₹{(totalMonthlyLimit || 0).toLocaleString()}</h2>
               <span className="pill-green">ON TRACK</span>
             </div>
             <div className="total-spent-mini" style={{ marginTop: '1.5rem' }}>
@@ -210,7 +214,7 @@ const Budgets = () => {
                   style={{ 
                     height: '100%', 
                     background: 'var(--brand-teal)', 
-                    width: `${Math.min((totalSpent / totalMonthlyLimit) * 100, 100)}%` 
+                    width: `${Math.min((totalSpent / (totalMonthlyLimit || 1)) * 100, 100)}%` 
                   }} 
                 />
               </div>
@@ -311,5 +315,4 @@ const Budgets = () => {
   );
 };
 
-export default Budgets;
 export default Budgets;
