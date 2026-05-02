@@ -14,11 +14,21 @@ const generateToken = (id) => {
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
 
+  if (!name || !email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide name, email, and password'
+    });
+  }
+
   try {
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'User already exists' 
+      });
     }
 
     const user = await User.create({
@@ -38,16 +48,26 @@ const registerUser = async (req, res) => {
       });
 
       res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        token,
+        success: true,
+        message: 'User registered successfully',
+        data: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          token,
+        }
       });
     } else {
-      res.status(400).json({ message: 'Invalid user data' });
+      res.status(400).json({ 
+        success: false,
+        message: 'Invalid user data' 
+      });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ 
+      success: false,
+      message: error.message 
+    });
   }
 };
 
@@ -70,17 +90,27 @@ const loginUser = async (req, res) => {
         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
       });
 
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        token,
+      res.status(200).json({
+        success: true,
+        message: 'Login successful',
+        data: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          token,
+        }
       });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      res.status(401).json({ 
+        success: false,
+        message: 'Invalid email or password' 
+      });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ 
+      success: false,
+      message: error.message 
+    });
   }
 };
 
@@ -92,23 +122,40 @@ const logoutUser = async (req, res) => {
     httpOnly: true,
     expires: new Date(0),
   });
-  res.status(200).json({ message: 'Logged out successfully' });
+  res.status(200).json({ 
+    success: true,
+    message: 'Logged out successfully' 
+  });
 };
 
 // @desc    Get user profile
 // @route   GET /api/auth/profile
 // @access  Private
 const getUserProfile = async (req, res) => {
-  const user = await User.findById(req.user._id);
+  try {
+    const user = await User.findById(req.user._id);
 
-  if (user) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+    if (user) {
+      res.status(200).json({
+        success: true,
+        message: 'User profile fetched successfully',
+        data: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+        }
+      });
+    } else {
+      res.status(404).json({ 
+        success: false,
+        message: 'User not found' 
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: error.message 
     });
-  } else {
-    res.status(404).json({ message: 'User not found' });
   }
 };
 

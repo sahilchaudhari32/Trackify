@@ -7,13 +7,24 @@ const setBudget = async (req, res) => {
   const { category, limit } = req.body;
 
   try {
+    if (!category || typeof limit !== 'number' || Number.isNaN(limit) || limit < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid category and non-negative limit'
+      });
+    }
+
     // Check if budget already exists for this category
     let budget = await Budget.findOne({ user: req.user._id, category });
 
     if (budget) {
       budget.limit = limit;
       await budget.save();
-      return res.json(budget);
+      return res.status(200).json({
+        success: true,
+        message: 'Budget updated successfully',
+        data: budget
+      });
     }
 
     budget = await Budget.create({
@@ -22,9 +33,16 @@ const setBudget = async (req, res) => {
       limit,
     });
 
-    res.status(201).json(budget);
+    res.status(201).json({
+      success: true,
+      message: 'Budget set successfully',
+      data: budget
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 
@@ -34,9 +52,16 @@ const setBudget = async (req, res) => {
 const getBudgets = async (req, res) => {
   try {
     const budgets = await Budget.find({ user: req.user._id });
-    res.json(budgets);
+    res.status(200).json({
+      success: true,
+      message: 'Budgets fetched successfully',
+      data: budgets
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 
